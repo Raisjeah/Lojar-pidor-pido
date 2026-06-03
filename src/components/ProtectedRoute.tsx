@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface ProtectedRouteProps {
@@ -9,6 +9,12 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, onUnauthorized }) => {
   const { user, loading } = useAuth();
 
+  useEffect(() => {
+    if (!loading && !user) {
+      onUnauthorized();
+    }
+  }, [loading, user, onUnauthorized]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -18,7 +24,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, onUnauthorize
   }
 
   if (!user) {
-    onUnauthorized();
     return null;
   }
 
