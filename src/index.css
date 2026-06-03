@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Custom palette based on Timor-Leste flag */
+  --color-maroon: #660022;
+  --color-maroon-dark: #4d0019;
+  --color-brightred: #DD1C39;
+  --color-brightred-hover: #c4142e;
+  --color-pinkcoral: #FF6666;
+  --color-timoryellow: #FFEE44;
+}
+
+@layer base {
+  body {
+    @apply font-sans bg-slate-50 text-slate-800 antialiased selection:bg-pinkcoral selection:text-white;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight;
+  }
+}
+
+/* Custom styles for image zoom container */
+.zoom-container {
+  overflow: hidden;
+  position: relative;
+}
+
+.zoom-image {
+  transition: transform 0.3s ease;
+}
+
+.zoom-image:hover {
+  transform: scale(1.6);
+}
+

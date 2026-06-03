@@ -1,0 +1,6 @@
+{
+  "name": "LojaRápido",
+  "description": "Plataforma e-commerce fashion & aksesoris perintis di Timor-Leste dengan kustomisasi tais lokal.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
