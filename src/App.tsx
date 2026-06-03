@@ -13,6 +13,8 @@ import Cart from './components/Cart';
 import CheckoutForm from './components/CheckoutForm';
 import OrderTracker from './components/OrderTracker';
 import WhatsAppFloat from './components/WhatsAppFloat';
+import Logo from './components/Logo';
+import NewsletterSignup from './components/NewsletterSignup';
 import { 
   ShoppingBag, 
   Search, 
@@ -176,21 +178,9 @@ export default function App() {
             </button>
             <div 
               onClick={() => { setActiveTab('katalog'); setSelectedCategory('All'); }}
-              className="flex items-center gap-3 cursor-pointer group active:scale-95 transition-transform"
+              className="flex items-center cursor-pointer group active:scale-95 transition-transform"
             >
-              <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-xl bg-[#FFEE44] p-1.5 flex items-center justify-center text-[#660022] shadow-md relative overflow-hidden flex-shrink-0 border border-white/10">
-                <svg className="w-5.5 h-5.5 text-[#660022]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <div className="flex flex-col">
-                <span className="font-display font-black text-lg sm:text-2xl tracking-tighter uppercase italic leading-none text-white group-hover:text-[#FFEE44] transition-colors">
-                  LOJA RÁPIDO
-                </span>
-                <span className="text-[9px] sm:text-[10px] text-[#FFEE44] tracking-wider uppercase font-semibold mt-0.5 font-mono">
-                  O Teu Estilo, Num Instante
-                </span>
-              </div>
+              <Logo size="normal" className="text-white group-hover:text-[#FFEE44] transition-colors" />
             </div>
           </div>
 
@@ -503,14 +493,14 @@ export default function App() {
       <footer className="bg-slate-900 text-white mt-12 border-t-8 border-timoryellow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           
+          <NewsletterSignup />
+
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             
             {/* Mission declaration */}
             <div className="space-y-3.5">
-              <h3 className="font-display font-black text-lg text-timoryellow tracking-wide">
-                LOJA RÁPIDO
-              </h3>
-              <p className="text-[11px] text-slate-300 leading-relaxed">
+              <Logo size="small" className="text-timoryellow opacity-90 hover:opacity-100 transition-opacity" />
+              <p className="text-[11px] text-slate-300 leading-relaxed max-w-xs mt-2">
                 Plataforma e-commerce perantis lori durbabel nian fashion rasik sapatos, ropa, koper kualidade as iha Munisípiu hotu iha Timor-Leste. Estilu foun, sosa lalais num instante!
               </p>
               <div className="text-[10px] text-slate-400 font-mono">
