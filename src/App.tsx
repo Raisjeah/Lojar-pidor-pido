@@ -15,6 +15,14 @@ import OrderTracker from './components/OrderTracker';
 import WhatsAppFloat from './components/WhatsAppFloat';
 import Logo from './components/Logo';
 import NewsletterSignup from './components/NewsletterSignup';
+import Login from './components/Login';
+import Register from './components/Register';
+import ProtectedRoute from './components/ProtectedRoute';
+import { useAuth } from './contexts/AuthContext';
+import { cartService } from './services/cartService';
+import { orderService } from './services/orderService';
+import { productService } from './services/productService';
+import GoogleButton from './components/GoogleButton';
 import { 
   ShoppingBag, 
   Search, 
@@ -34,8 +42,8 @@ import {
 } from 'lucide-react';
 
 export default function App() {
-  // Navigation views: 'katalog' | 'checkout' | 'tracking' | 'favoritos'
-  const [activeTab, setActiveTab] = useState<'katalog' | 'checkout' | 'tracking' | 'favoritos'>('katalog');
+  // Navigation views: 'katalog' | 'checkout' | 'tracking' | 'favoritos' | 'login' | 'register'
+  const [activeTab, setActiveTab] = useState<'katalog' | 'checkout' | 'tracking' | 'favoritos' | 'login' | 'register'>('katalog');
   
   // Filtering & Catalog
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
@@ -46,20 +54,47 @@ export default function App() {
   const [cartOpen, setCartOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const { user, logout, loading } = useAuth();
+
   // Persistence State
   const [cart, setCart] = useState<CartItem[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [wishlistIds, setWishlistIds] = useState<string[]>([]);
+  const [dbProducts, setDbProducts] = useState<any[]>([]);
 
-  // Load from local storage
+  // Load initial data
   useEffect(() => {
-    const savedCart = localStorage.getItem('loja_rapido_cart');
-    const savedOrders = localStorage.getItem('loja_rapido_orders');
-    const savedWishlist = localStorage.getItem('loja_rapido_wishlist');
-    if (savedCart) setCart(JSON.parse(savedCart));
-    if (savedOrders) setOrders(JSON.parse(savedOrders));
-    if (savedWishlist) setWishlistIds(JSON.parse(savedWishlist));
-  }, []);
+    const loadData = async () => {
+      try {
+        const prods = await productService.getProducts();
+        if (prods && prods.length > 0) {
+            setDbProducts(prods);
+        }
+
+        if (user) {
+          const cartData = await cartService.getCart();
+          if (cartData && cartData.items) setCart(cartData.items);
+
+          const ordersData = await orderService.getMyOrders();
+          if (ordersData) setOrders(ordersData);
+        } else {
+            const savedCart = localStorage.getItem('loja_rapido_cart');
+            const savedOrders = localStorage.getItem('loja_rapido_orders');
+            if (savedCart) setCart(JSON.parse(savedCart));
+            if (savedOrders) setOrders(JSON.parse(savedOrders));
+        }
+
+        const savedWishlist = localStorage.getItem('loja_rapido_wishlist');
+        if (savedWishlist) setWishlistIds(JSON.parse(savedWishlist));
+      } catch (error) {
+        console.error("Failed to load initial data", error);
+      }
+    };
+
+    if (!loading) {
+      loadData();
+    }
+  }, [user, loading]);
 
   const toggleWishlist = (e: React.MouseEvent, productId: string) => {
     e.stopPropagation();
@@ -245,9 +280,22 @@ export default function App() {
             </button>
 
             {/* Simulated profile block or user avatar */}
-            <div className="h-10 w-10 rounded-full bg-timoryellow text-maroon font-bold text-xs uppercase flex items-center justify-center shadow-inner cursor-pointer" title="Perpustakaan Dili Student">
-              <User size={16} />
-            </div>
+            {user ? (
+               <div className="flex items-center gap-2">
+                 <div className="h-10 w-10 rounded-full bg-timoryellow text-maroon font-bold text-xs uppercase flex items-center justify-center shadow-inner cursor-pointer overflow-hidden">
+                   {user.avatar && user.avatar.url ? (
+                      <img src={user.avatar.url} alt="User Avatar" className="h-full w-full object-cover" />
+                   ) : (
+                      <span className="text-sm">{user.name.charAt(0)}</span>
+                   )}
+                 </div>
+                 <button onClick={logout} className="text-white text-xs hover:text-timoryellow font-bold uppercase transition-colors mr-2">Sair</button>
+               </div>
+            ) : (
+               <button onClick={() => setActiveTab('login')} className="h-9 px-4 rounded-full bg-timoryellow text-maroon font-bold text-xs uppercase shadow-inner hover:bg-yellow-400 transition-colors ml-2">
+                 Entrar (Login)
+               </button>
+            )}
           </div>
 
         </div>
@@ -400,13 +448,34 @@ export default function App() {
           </div>
         )}
 
+        {/* AUTH VIEWS */}
+        {activeTab === 'login' && (
+          <div className="py-12">
+            <Login
+              onSuccess={() => setActiveTab('katalog')}
+              onSwitchToRegister={() => setActiveTab('register')}
+            />
+          </div>
+        )}
+
+        {activeTab === 'register' && (
+          <div className="py-12">
+            <Register
+              onSuccess={() => setActiveTab('katalog')}
+              onSwitchToLogin={() => setActiveTab('login')}
+            />
+          </div>
+        )}
+
         {/* VIEW 2: SINGLE-PAGE CHECKOUT FORM */}
         {activeTab === 'checkout' && (
-          <CheckoutForm 
-            cart={cart}
-            onBackToCart={() => { setActiveTab('katalog'); }}
-            onOrderCreated={handleOrderCreated}
-          />
+          <ProtectedRoute onUnauthorized={() => setActiveTab('login')}>
+            <CheckoutForm
+              cart={cart}
+              onBackToCart={() => { setActiveTab('katalog'); }}
+              onOrderCreated={handleOrderCreated}
+            />
+          </ProtectedRoute>
         )}
 
         {/* VIEW 3: ORDER STEP-STATUS TRACKER */}
